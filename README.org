@@ -1,0 +1,314 @@
+#+TITLE: Literature Hyprland Configuration
+#+PROPERTY: header-args:conf :tangle hyprland.conf
+
+* TODOs
+- [ ] autostart
+- [ ] shell environment variables
+
+* Before
+** Nvidia
+#+begin_src toml
+[nvidia]
+packages = ["nvidia-open-dkms", "nvidia-utils", "libva-nvidia-driver"]
+#+end_src
+
+#+begin_src conf
+env = GBM_BACKEND,nvidia-drm
+env = LIBVA_DRIVER_NAME,nvidia
+env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+env = NVD_BACKEND,direct
+#+end_src
+
+** Display manager
+[[https://bbs.archlinux.org/viewtopic.php?id=289612][SDDM running on Wayland and Hyprland ...]]
+[[https://wiki.archlinux.org/title/SDDM#Enable_HiDPI][SDDM - ArchWiki]]
+#+begin_src conf :tangle /sudo::/etc/sddm.conf.d/default.conf :tangle no
+[General]
+# Which display server should be used.
+# Valid values are: x11, x11-user, wayland. Wayland support is experimental
+DisplayServer=wayland
+GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
+# GreeterEnvironment=QT_SCREEN_SCALE_FACTORS=2,QT_FONT_DPI=168
+
+[Wayland]
+EnableHiDPI=true
+CompositorCommand=Hyprland
+#+end_src
+
+** Key map
+#+begin_src toml
+[key-map]
+packages = ["keyd"]
+#+end_src
+
+Start =keyd.service= (system wide)
+#+begin_src conf :tangle /sudo::/etc/keyd/default.conf :tangle no
+[ids]
+*
+
+[main]
+leftcontrol  = overload(control, esc)
+#+end_src
+
+** Monitor
+With HIDPI settings
+
+[[https://wiki.hypr.land/Configuring/XWayland/][XWayland – Hyprland Wiki]]
+Use auto scale [[https://github.com/hyprwm/Hyprland/blob/5ca48231287d67e75a3f21dbdbc47d6dc65752c4/src/helpers/Monitor.cpp#L563-L579][Hyprland/src/helpers/Monitor.cpp at 5...]]
+#+begin_src conf
+# change monitor to high resolution, the last argument is the scale factor
+# monitor = , highres, auto, 1.67, bitdepth, 10
+
+# unscale XWayland
+xwayland {
+  force_zero_scaling = true
+}
+
+# toolkit-specific scale
+env = GDK_SCALE,2
+#+end_src
+
+See also
+https://github.com/hyprwm/Hyprland/discussions/7923
+
+You may set [[file:~/.Xresources]] also.
+
+* With
+** Auto Start
+#+begin_src conf
+exec-once = dbus-update-activation-environment --systemd --all
+exec-once = systemctl --user start hyprland-session.target
+
+exec-once = clash-verge
+exec-once = nextcloud
+exec-once = udiskie -ans
+#+end_src
+
+** Environment Variables
+[[https://wiki.hypr.land/Configuring/Environment-variables/#xdg-specifications][Environment variables – Hyprland Wiki]]
+#+begin_src conf
+env = XDG_CURRENT_DESKTOP,Hyprland
+env = XDG_SESSION_TYPE,wayland
+env = XDG_SESSION_DESKTOP,Hyprland
+#+end_src
+
+** COMMENT Eye Candy
+#+begin_src toml
+["eye-candy"]
+packages = ["gammastep"]
+#+end_src
+
+#+begin_src conf
+exec-once = gammastep-indicator
+#+end_src
+
+Configuration see [[file:~/.config/gammastep/config.ini]]
+
+* After
+** COMMENT Wallpaper
+#+begin_src toml
+[wallpaper]
+packages = ["swww", "waypaper"]
+#+end_src
+
+[[https://anufrievroman.gitbook.io/waypaper/usage][Usage | Waypaper]]
+#+begin_src conf
+exec-once = waypaper --restore
+exec-once = systemctl --user start waypaper.timer
+#+end_src
+
+#+begin_src conf :tangle ~/.config/systemd/user/waypaper.timer
+[Unit]
+Description=Set a random wallpaper every minute
+
+[Timer]
+OnStartupSec=1min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
+#+end_src
+
+#+begin_src conf :tangle ~/.config/systemd/user/waypaper.service
+[Unit]
+Description=Set a random wallpaper with waypaper
+
+[Service]
+Type=oneshot
+# https://unix.stackexchange.com/a/547817
+LogLevelMax=alert
+SyslogLevel=2
+ExecStart=waypaper --random
+#+end_src
+
+** Status Bar
+** COMMENT Lock Screen
+[[https://www.reddit.com/r/hyprland/comments/14u9p3v/turning_off_screens_after_locking_them/][Turning off screens after locking them ]]
+
+#+begin_src conf
+exec-once = systemctl --user start hypridle.service
+bind = $mainMod SHIFT, l, exec, loginctl lock-session
+#+end_src
+
+#+begin_src bash :tangle lock.sh :file-mode (identity #o755) :shebang "#!/usr/bin/bash"
+pidof hyprlock || hyprlock &
+sleep 7
+hyprctl dispatch dpms off
+#+end_src
+
+#+begin_src conf :tangle hypridle.conf
+general {
+    lock_cmd = ~/.config/hypr/lock.sh
+    on_lock_cmd = openrgb --noautoconnect -m off
+    on_unlock_cmd = openrgb --noautoconnect -m rainbow
+}
+
+listener {
+    timeout = 600
+    on-timeout = loginctl lock-session
+}
+#+end_src
+
+** Others
+Screen sharing
+[[https://wiki.archlinux.org/title/Open_Broadcaster_Software#Wayland][Open Broadcaster Software - ArchWiki]]
+[[https://wiki.archlinux.org/title/XDG_Desktop_Portal#Portal_does_not_start][XDG Desktop Portal - ArchWiki]]
+#+begin_src toml
+[others]
+packages = ["xdg-desktop-portal-hyprland", "xdg-desktop-portal-wlr"]
+#+end_src
+
+* Variables
+#+begin_src conf :tangle no
+# https://wiki.hypr.land/Configuring/Variables/#animations
+animations {
+    enabled = yes, please :)
+
+    # Default curves, see https://wiki.hypr.land/Configuring/Animations/#curves
+    #        NAME,           X0,   Y0,   X1,   Y1
+    bezier = easeOutQuint,   0.23, 1,    0.32, 1
+    bezier = easeInOutCubic, 0.65, 0.05, 0.36, 1
+    bezier = linear,         0,    0,    1,    1
+    bezier = almostLinear,   0.5,  0.5,  0.75, 1
+    bezier = quick,          0.15, 0,    0.1,  1
+
+    # Default animations, see https://wiki.hypr.land/Configuring/Animations/
+    #           NAME,          ONOFF, SPEED, CURVE,        [STYLE]
+    animation = global,        1,     10,    default
+    animation = border,        1,     5.39,  easeOutQuint
+    animation = windows,       1,     4.79,  easeOutQuint
+    animation = windowsIn,     1,     4.1,   easeOutQuint, popin 87%
+    animation = windowsOut,    1,     1.49,  linear,       popin 87%
+    animation = fadeIn,        1,     1.73,  almostLinear
+    animation = fadeOut,       1,     1.46,  almostLinear
+    animation = fade,          1,     3.03,  quick
+    animation = layers,        1,     3.81,  easeOutQuint
+    animation = layersIn,      1,     4,     easeOutQuint, fade
+    animation = layersOut,     1,     1.5,   linear,       fade
+    animation = fadeLayersIn,  1,     1.79,  almostLinear
+    animation = fadeLayersOut, 1,     1.39,  almostLinear
+    animation = workspaces,    1,     1.94,  almostLinear, fade
+    animation = workspacesIn,  1,     1.21,  almostLinear, fade
+    animation = workspacesOut, 1,     1.94,  almostLinear, fade
+    animation = zoomFactor,    1,     7,     quick
+}
+#+end_src
+
+#+begin_src conf
+dwindle {
+    preserve_split = true
+}
+
+master {
+    mfact = 0.5
+}
+#+end_src
+
+#+begin_src conf
+misc {
+    key_press_enables_dpms = true
+    focus_on_activate = true
+    
+    disable_hyprland_logo = true
+    disable_splash_rendering = true
+}
+#+end_src
+
+* Window Rules
+#+begin_src conf
+windowrule = float on, match:class .*
+#+end_src
+
+#+begin_src conf :tangle no
+# Ignore maximize requests from apps. You'll probably like this.
+# windowrule = suppressevent maximize, class:.*
+
+# Fix some dragging issues with XWayland
+windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
+#+end_src
+
+For Picture-in-Picture from =librewolf=
+#+begin_src conf :tangle no
+windowrule = float,class:^(librewolf)$,title:^(Picture-in-Picture)$
+windowrule = move 10 100%-w-10,class:^(librewolf)$,title:^(Picture-in-Picture)$
+windowrule = focusonactivate on,class:^(librewolf)$,title:^(Picture-in-Picture)$
+#+end_src
+
+#+begin_src conf
+windowrule = float on, match:class ^(blueman-manager)$
+windowrule = float on, match:class ^(xdg-desktop-portal)$
+
+windowrule = no_initial_focus on, match:class ^(steam)$, match:title ^(notificationtoasts)
+windowrule = pin on, match:class ^(steam)$, match:title ^(notificationtoasts)
+
+windowrule = float on, match:class ^(firefox)$, match:title ^(Picture-in-Picture)$
+
+# DMS windows floating by default
+# ! Hyprland doesn't size these windows correctly so disabling by default here
+# windowrule = float on, match:class ^(org.quickshell)$
+
+layerrule = no_anim on, match:namespace ^(quickshell)$
+layerrule = no_anim on, match:namespace ^dms:.*
+#+end_src
+
+* DMS
+#+begin_src conf
+source = ./dms/colors.conf
+source = ./dms/outputs.conf
+source = ./dms/layout.conf
+source = ./dms/cursor.conf
+source = ./dms/binds.conf
+source = ./dms/windowrules.conf
+#+end_src
+
+* Key Bindings
+#+begin_src conf
+# Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
+bind = SUPER, Return, exec, vterm
+# bind = SUPER, M, exit,
+bind = SUPER, r, exec, dirvish
+bind = SUPER, p, pseudo, # dwindle
+bind = SUPER, t, togglesplit, # dwindle
+
+bind = SUPER SHIFT, P, pin
+
+bind = SUPER SHIFT, e, exec, dms ipc call powermenu toggle
+bind = SUPER, A, exec, dms ipc call spotlight toggle
+
+# Example special workspace (scratchpad)
+bind = SUPER, S, togglespecialworkspace, magic
+bind = SUPER SHIFT, S, movetoworkspace, special:magic
+
+# Move/resize windows with SUPER + LMB/RMB and dragging
+bindm = SUPER, mouse:272, movewindow
+bindm = SUPER, mouse:273, resizewindow
+#+end_src
+
+Who will focus a window with raise it?
+#+begin_src conf
+bind = SUPER, j, cyclenext, d
+bind = SUPER, j, bringactivetotop, d
+bind = SUPER, k, cyclenext, prev, d
+bind = SUPER, k, bringactivetotop, d
+#+end_src
+[[https://github.com/hyprwm/Hyprland/discussions/5451][Raise a window upon focused? · hyprwm...]]
