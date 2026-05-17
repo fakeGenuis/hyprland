@@ -65,7 +65,7 @@ xwayland {
 }
 
 # toolkit-specific scale
-env = GDK_SCALE,2
+env = GDK_SCALE, 2
 #+end_src
 
 See also
@@ -284,9 +284,9 @@ source = ./dms/windowrules.conf
 * Key Bindings
 #+begin_src conf
 # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-bind = SUPER, Return, exec, vterm
+bind = SUPER, Return, exec, fish -lc vterm
 # bind = SUPER, M, exit,
-bind = SUPER, r, exec, dirvish
+bind = SUPER, r, exec, fish -lc dirvish
 bind = SUPER, p, pseudo, # dwindle
 bind = SUPER, t, togglesplit, # dwindle
 
