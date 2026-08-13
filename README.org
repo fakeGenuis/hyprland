@@ -77,14 +77,23 @@ You may set [[file:~/.Xresources]] also.
 
 * With
 ** Auto Start
-#+begin_src conf
-exec-once = dbus-update-activation-environment --systemd --all
-exec-once = systemctl --user start hyprland-session.target
+Autostart is owned by DMS, not =exec-once=. =hyprland.lua= starts
+=hyprland-session.target= (DMS-generated block), which starts =dms.service=;
+DMS then manages the "Autostart Apps" list (=~/.config/autostart/*.desktop=).
 
-exec-once = clash-verge
-exec-once = nextcloud
-exec-once = udiskie -ans
+The DMS tab only shows when =xdg-desktop-autostart.target= is active, and that
+target is =static= + =RefuseManualStart=yes= — it must be pulled in with
+=Wants=. =niri.service= ships this; the DMS-generated =hyprland-session.target=
+does not, so add a drop-in (survives regeneration):
+
+#+begin_src conf :tangle ~/.config/systemd/user/hyprland-session.target.d/autostart.conf
+[Unit]
+Wants=xdg-desktop-autostart.target
+Before=xdg-desktop-autostart.target
 #+end_src
+
+then run =systemctl --user daemon-reload= (never =systemctl --user start
+xdg-desktop-autostart.target= directly — it is refused).
 
 ** Environment Variables
 [[https://wiki.hypr.land/Configuring/Environment-variables/#xdg-specifications][Environment variables – Hyprland Wiki]]
