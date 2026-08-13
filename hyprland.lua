@@ -93,3 +93,18 @@ require("dms.cursor")
 require("dms.binds")
 require("dms.binds-user")
 require("dms.windowrules")
+
+-- Elden Ring Nightreign -> named workspace 
+-- Use a normal named workspace so SUPER+1..9 can leave it normally.
+hl.window_rule({
+	match = { class = "^(steam_app_2622380|nightreign\\.exe)$" },
+	workspace = "name: silent",
+	render_unfocused = true,
+})
+
+hl.unbind("SUPER + G")
+hl.bind("SUPER + G", function()
+	local workspace = hl.get_active_workspace()
+	local target = workspace and workspace.name == "" and "previous" or "name:"
+	hl.dispatch(hl.dsp.focus({ workspace = target }))
+end, { description = "Toggle game workspace" })
