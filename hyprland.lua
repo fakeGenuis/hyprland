@@ -7,6 +7,9 @@ hl.env(
     os.getenv("XDG_RUNTIME_DIR") .. "/gnupg/S.gpg-agent.ssh"
 )
 
+hl.env("LIBVA_DRIVER_NAME", "nvidia")          -- VA-API decode (libva-nvidia-driver)
+hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")  -- GLX vendor in XWayland
+
 -- DMS_STARTUP_BEGIN
 hl.on("hyprland.start", function()
 	hl.exec_cmd("dbus-update-activation-environment --systemd --all")

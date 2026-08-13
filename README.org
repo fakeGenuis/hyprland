@@ -1,5 +1,6 @@
 #+TITLE: Literature Hyprland Configuration
 #+PROPERTY: header-args:conf :tangle hyprland.conf
+#+PROPERTY: header-args:lua :tangle no
 
 * TODOs
 - [ ] autostart
@@ -12,11 +13,12 @@
 packages = ["nvidia-open-dkms", "nvidia-utils", "libva-nvidia-driver"]
 #+end_src
 
-#+begin_src conf
-env = GBM_BACKEND,nvidia-drm
-env = LIBVA_DRIVER_NAME,nvidia
-env = __GLX_VENDOR_LIBRARY_NAME,nvidia
-env = NVD_BACKEND,direct
+Env vars live in =hyprland.lua=; only two are needed (=GBM_BACKEND= and
+=NVD_BACKEND= are obsolete wlroots / old-vaapi leftovers).
+
+#+begin_src lua
+hl.env("LIBVA_DRIVER_NAME", "nvidia")          -- VA-API decode (libva-nvidia-driver)
+hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")  -- GLX vendor in XWayland
 #+end_src
 
 ** Display manager
