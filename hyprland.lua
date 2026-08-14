@@ -17,6 +17,8 @@ hl.env("no_proxy", "localhost,127.0.0.1,::1")
 
 -- DMS_STARTUP_BEGIN
 hl.on("hyprland.start", function()
+	-- Load DPI and cursor resources for XWayland applications.
+	hl.exec_cmd("xrdb -merge " .. os.getenv("HOME") .. "/.config/X11/Xresources")
 	hl.exec_cmd("dbus-update-activation-environment --systemd --all")
 	hl.exec_cmd("systemctl --user start hyprland-session.target")
 end)
@@ -48,7 +50,7 @@ hl.config({
 			color = "rgba(00000070)",
 		},
 	},
-	-- Render XWayland at native 1:1 to avoid blur under fractional scaling (1.6).
+	-- Render XWayland at native 1:1 to avoid blur under fractional scaling.
 	-- Tradeoff: XWayland windows are unscaled; compensate with in-app UI scaling.
 	xwayland = {
 		force_zero_scaling = true,
