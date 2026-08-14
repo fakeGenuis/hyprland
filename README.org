@@ -295,6 +295,33 @@ require("dms.windowrules")
 [[https://github.com/hyprwm/hyprland-plugins][hyprfocus]] briefly animates the newly focused window, making keyboard-driven
 focus changes easier to follow.
 
+** ScrollOverview
+[[https://github.com/yayuuu/hyprland-scroll-overview][ScrollOverview]] provides a Niri-like overview of the existing workspaces and
+supports configurable keyboard navigation.
+
+#+begin_src lua
+hl.config({
+    plugin = {
+        scrolloverview = {
+            gesture_distance = 300,
+            scale = 0.5,
+            workspace_gap = 100,
+            layout = "vertical",
+            wallpaper = 2,
+            blur = true,
+            shadow = {
+                enabled = true,
+                range = 50,
+            },
+        },
+    },
+})
+
+-- Replace the DMS overview binding with ScrollOverview.
+hl.unbind("SUPER + O")
+hl.bind("SUPER + O", function()
+    hl.plugin.scrolloverview.overview("toggle all")
+end, { description = "Toggle ScrollOverview" })
 #+end_src
 
 * Key Bindings
