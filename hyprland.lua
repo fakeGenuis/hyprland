@@ -58,6 +58,8 @@ hl.config({
 	misc = {
 		disable_hyprland_logo = true,
 		disable_splash_rendering = true,
+		-- wake the monitor on any key press after lock.sh does `dpms off`
+		key_press_enables_dpms = true,
 		-- FPS cap for render_unfocused windows (games keep full fps in background)
 		render_unfocused_fps = 60,
 	},
