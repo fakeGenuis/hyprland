@@ -1,5 +1,6 @@
 # tangled from README.org
 hyprland.lua
+packages.toml
 
 # DMS-generated artifacts (regenerated from ~/.config/DankMaterialShell/)
 dms/binds.lua

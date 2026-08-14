@@ -1,5 +1,6 @@
 #+TITLE: Literature Hyprland Configuration
 #+PROPERTY: header-args:lua :tangle hyprland.lua
+#+PROPERTY: header-args:toml :tangle packages.toml
 
 * Before
 ** Nvidia
