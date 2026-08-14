@@ -290,6 +290,13 @@ require("dms.binds-user")
 require("dms.windowrules")
 #+end_src
 
+* Plugins
+** hyprfocus
+[[https://github.com/hyprwm/hyprland-plugins][hyprfocus]] briefly animates the newly focused window, making keyboard-driven
+focus changes easier to follow.
+
+#+end_src
+
 * Key Bindings
 Keybindings are layered: DMS ships the defaults in =dms/binds.lua=, my overrides
 live in =dms/binds-user.lua= (git-tracked), and =hyprland.lua= holds only the
