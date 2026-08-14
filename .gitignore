@@ -1,0 +1,10 @@
+# DMS-generated artifacts (regenerated from ~/.config/DankMaterialShell/)
+dms/binds.lua
+dms/colors.lua
+dms/cursor.lua
+dms/layout.lua
+dms/outputs.lua
+dms/windowrules.lua
+
+# DMS legacy-config migration backups
+.dms-backups/
