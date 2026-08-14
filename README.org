@@ -53,27 +53,14 @@ leftcontrol  = overload(control, esc)
 #+end_src
 
 ** Monitor
-With HIDPI settings
+HiDPI scaling is managed by DMS (=dms/outputs.lua=), so nothing to set here.
+=hyprland.lua= runs =sync-xresources-dpi.sh= at startup to sync =Xft.dpi= with
+the monitor scale, and sets =xwayland.force_zero_scaling=.
 
-[[https://wiki.hypr.land/Configuring/XWayland/][XWayland – Hyprland Wiki]]
-Use auto scale [[https://github.com/hyprwm/Hyprland/blob/5ca48231287d67e75a3f21dbdbc47d6dc65752c4/src/helpers/Monitor.cpp#L563-L579][Hyprland/src/helpers/Monitor.cpp at 5...]]
-#+begin_src conf
-# change monitor to high resolution, the last argument is the scale factor
-# monitor = , highres, auto, 1.67, bitdepth, 10
-
-# unscale XWayland
-xwayland {
-  force_zero_scaling = true
-}
-
-# toolkit-specific scale
-env = GDK_SCALE, 2
-#+end_src
+[[https://wiki.hypr.land/Configuring/Advanced-and-Cool/XWayland/][XWayland – Hyprland Wiki]]
 
 See also
 https://github.com/hyprwm/Hyprland/discussions/7923
-
-You may set [[file:~/.Xresources]] also.
 
 * With
 ** Auto Start
