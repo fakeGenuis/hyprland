@@ -21,7 +21,7 @@ greetd + DMS greeter. See [[https://wiki.archlinux.org/title/Greetd][Greetd - Ar
 
 #+begin_src toml
 [greetd]
-packages = ["greetd-dms-greeter-git"]
+packages = ["greetd-dms-greeter-git", "gnome-keyring"]
 #+end_src
 
 #+begin_src toml :tangle /sudo::/etc/greetd/config.toml :tangle no
@@ -31,6 +31,20 @@ vt = 1
 [default_session]
 command = "/usr/bin/dms-greeter --command hyprland"
 user = "greeter"
+#+end_src
+
+greetd must unlock the GNOME login keyring so applications such as Nextcloud
+can retrieve stored credentials without prompting again.
+
+Add the following entries to =/etc/pam.d/greetd=:
+
+#+begin_src diff :tangle no
+ auth       include      system-local-login
++auth       optional     pam_gnome_keyring.so
+
+ account    include      system-local-login
+ session    include      system-local-login
++session    optional     pam_gnome_keyring.so auto_start
 #+end_src
 
 ** Key map
