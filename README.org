@@ -6,7 +6,7 @@
 ** Nvidia
 #+begin_src toml
 [nvidia]
-packages = ["nvidia-open-dkms", "nvidia-utils", "libva-nvidia-driver"]
+packages = ["nvidia-open-dkms", "libva-nvidia-driver"]
 #+end_src
 
 =GBM_BACKEND= and =NVD_BACKEND= are obsolete and omitted.
@@ -289,6 +289,8 @@ require("dms.binds")
 require("dms.binds-user")
 require("dms.windowrules")
 #+end_src
+
+TODO: Add a DankBar widget to display and switch the active Hyprland window layout.
 
 * Plugins
 ** hyprfocus
