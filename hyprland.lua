@@ -10,6 +10,11 @@ hl.env(
 hl.env("LIBVA_DRIVER_NAME", "nvidia")          -- VA-API decode (libva-nvidia-driver)
 hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")  -- GLX vendor in XWayland
 
+hl.env("XMODIFIERS", "@im=fcitx")
+hl.env("QT_IM_MODULE", "fcitx")
+hl.env("https_proxy", "http://127.0.0.1:8889")
+hl.env("no_proxy", "localhost,127.0.0.1,::1")
+
 -- DMS_STARTUP_BEGIN
 hl.on("hyprland.start", function()
 	hl.exec_cmd("dbus-update-activation-environment --systemd --all")
