@@ -1,10 +1,5 @@
 #+TITLE: Literature Hyprland Configuration
-#+PROPERTY: header-args:conf :tangle hyprland.conf
-#+PROPERTY: header-args:lua :tangle no
-
-* TODOs
-- [ ] autostart
-- [ ] shell environment variables
+#+PROPERTY: header-args:lua :tangle hyprland.lua
 
 * Before
 ** Nvidia
@@ -81,7 +76,7 @@ active, and that target is =static= + =RefuseManualStart=yes= — it must be
 pulled in with =Wants=. =niri.service= ships this; the DMS-generated
 =hyprland-session.target= does not, so add a drop-in (survives regeneration):
 
-#+begin_src conf :tangle ~/.config/systemd/user/hyprland-session.target.d/autostart.conf
+#+begin_src conf :tangle ~/.config/systemd/user/hyprland-session.target.d/autostart.conf :tangle no
 [Unit]
 Wants=xdg-desktop-autostart.target
 Before=xdg-desktop-autostart.target
