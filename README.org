@@ -83,12 +83,7 @@ then run =systemctl --user daemon-reload= (never =systemctl --user start
 xdg-desktop-autostart.target= directly — it is refused).
 
 ** Environment Variables
-[[https://wiki.hypr.land/Configuring/Environment-variables/#xdg-specifications][Environment variables – Hyprland Wiki]]
-#+begin_src conf
-env = XDG_CURRENT_DESKTOP,Hyprland
-env = XDG_SESSION_TYPE,wayland
-env = XDG_SESSION_DESKTOP,Hyprland
-#+end_src
+[[https://wiki.hypr.land/Configuring/Advanced-and-Cool/Environment-variables/][Environment variables – Hyprland Wiki]]
 
 ** COMMENT Eye Candy
 #+begin_src toml
@@ -139,7 +134,6 @@ SyslogLevel=2
 ExecStart=waypaper --random
 #+end_src
 
-** Status Bar
 ** COMMENT Lock Screen
 [[https://www.reddit.com/r/hyprland/comments/14u9p3v/turning_off_screens_after_locking_them/][Turning off screens after locking them ]]
 
@@ -173,140 +167,85 @@ Screen sharing
 [[https://wiki.archlinux.org/title/XDG_Desktop_Portal#Portal_does_not_start][XDG Desktop Portal - ArchWiki]]
 #+begin_src toml
 [others]
-packages = ["xdg-desktop-portal-hyprland", "xdg-desktop-portal-wlr"]
+packages = ["xdg-desktop-portal-hyprland", "xdg-desktop-portal-gtk"]
 #+end_src
 
 * Variables
-#+begin_src conf :tangle no
-# https://wiki.hypr.land/Configuring/Variables/#animations
-animations {
-    enabled = yes, please :)
+#+begin_src lua
+hl.config({
+	dwindle = {
+		preserve_split = true,
+	},
+	master = {
+		mfact = 0.5,
+	},
+	misc = {
+		disable_hyprland_logo = true,
+		disable_splash_rendering = true,
+		-- wake the monitor on any key press after lock.sh does `dpms off`
+		key_press_enables_dpms = true,
+		-- FPS cap for render_unfocused windows (games keep full fps in background)
+		render_unfocused_fps = 60,
+	},
+})
 
-    # Default curves, see https://wiki.hypr.land/Configuring/Animations/#curves
-    #        NAME,           X0,   Y0,   X1,   Y1
-    bezier = easeOutQuint,   0.23, 1,    0.32, 1
-    bezier = easeInOutCubic, 0.65, 0.05, 0.36, 1
-    bezier = linear,         0,    0,    1,    1
-    bezier = almostLinear,   0.5,  0.5,  0.75, 1
-    bezier = quick,          0.15, 0,    0.1,  1
-
-    # Default animations, see https://wiki.hypr.land/Configuring/Animations/
-    #           NAME,          ONOFF, SPEED, CURVE,        [STYLE]
-    animation = global,        1,     10,    default
-    animation = border,        1,     5.39,  easeOutQuint
-    animation = windows,       1,     4.79,  easeOutQuint
-    animation = windowsIn,     1,     4.1,   easeOutQuint, popin 87%
-    animation = windowsOut,    1,     1.49,  linear,       popin 87%
-    animation = fadeIn,        1,     1.73,  almostLinear
-    animation = fadeOut,       1,     1.46,  almostLinear
-    animation = fade,          1,     3.03,  quick
-    animation = layers,        1,     3.81,  easeOutQuint
-    animation = layersIn,      1,     4,     easeOutQuint, fade
-    animation = layersOut,     1,     1.5,   linear,       fade
-    animation = fadeLayersIn,  1,     1.79,  almostLinear
-    animation = fadeLayersOut, 1,     1.39,  almostLinear
-    animation = workspaces,    1,     1.94,  almostLinear, fade
-    animation = workspacesIn,  1,     1.21,  almostLinear, fade
-    animation = workspacesOut, 1,     1.94,  almostLinear, fade
-    animation = zoomFactor,    1,     7,     quick
-}
-#+end_src
-
-#+begin_src conf
-dwindle {
-    preserve_split = true
-}
-
-master {
-    mfact = 0.5
-}
-#+end_src
-
-#+begin_src conf
-misc {
-    key_press_enables_dpms = true
-    focus_on_activate = true
-    
-    disable_hyprland_logo = true
-    disable_splash_rendering = true
-}
+hl.animation({ leaf = "windowsIn", enabled = true, speed = 3, bezier = "default" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 3, bezier = "default" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "default" })
+hl.animation({ leaf = "windowsMove", enabled = true, speed = 4, bezier = "default" })
+hl.animation({ leaf = "fade", enabled = true, speed = 3, bezier = "default" })
+hl.animation({ leaf = "border", enabled = true, speed = 3, bezier = "default" })
 #+end_src
 
 * Window Rules
-#+begin_src conf
-windowrule = float on, match:class .*
-#+end_src
+#+begin_src lua
+hl.window_rule({ match = { class = "^(nm-connection-editor|pavucontrol)$" }, float = true, center = true, size = { 900, 600 } })
+hl.window_rule({ match = { class = "^(blueman-manager)$" }, float = true, center = true, size = { 600, 480 } })
+hl.window_rule({ match = { class = "^(xdg-desktop-portal)$" }, float = true })
+-- Steam notification toasts: float pinned at bottom-right, 20px margin
+hl.window_rule({
+	match = { class = "^(steam)$", title = "^(notificationtoasts)$" },
+	no_initial_focus = true,
+	pin = true
+})
+-- gamescope containers also keep full fps in background
+hl.window_rule({
+	match = { class = "^(gamescope)$" },
+	render_unfocused = true,
+})
+hl.layer_rule({ match = { namespace = "^(quickshell)$" }, no_anim = true })
+hl.layer_rule({ match = { namespace = "^dms:.*" }, no_anim = true })
 
-#+begin_src conf :tangle no
-# Ignore maximize requests from apps. You'll probably like this.
-# windowrule = suppressevent maximize, class:.*
-
-# Fix some dragging issues with XWayland
-windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
-#+end_src
-
-For Picture-in-Picture from =librewolf=
-#+begin_src conf :tangle no
-windowrule = float,class:^(librewolf)$,title:^(Picture-in-Picture)$
-windowrule = move 10 100%-w-10,class:^(librewolf)$,title:^(Picture-in-Picture)$
-windowrule = focusonactivate on,class:^(librewolf)$,title:^(Picture-in-Picture)$
-#+end_src
-
-#+begin_src conf
-windowrule = float on, match:class ^(blueman-manager)$
-windowrule = float on, match:class ^(xdg-desktop-portal)$
-
-windowrule = no_initial_focus on, match:class ^(steam)$, match:title ^(notificationtoasts)
-windowrule = pin on, match:class ^(steam)$, match:title ^(notificationtoasts)
-
-windowrule = float on, match:class ^(firefox)$, match:title ^(Picture-in-Picture)$
-
-# DMS windows floating by default
-# ! Hyprland doesn't size these windows correctly so disabling by default here
-# windowrule = float on, match:class ^(org.quickshell)$
-
-layerrule = no_anim on, match:namespace ^(quickshell)$
-layerrule = no_anim on, match:namespace ^dms:.*
+-- Elden Ring Nightreign -> named workspace 
+-- Use a normal named workspace so SUPER+1..9 can leave it normally.
+hl.window_rule({
+	match = { class = "^(steam_app_2622380|nightreign\\.exe)$" },
+	workspace = "name: silent",
+	render_unfocused = true,
+})
 #+end_src
 
 * DMS
-#+begin_src conf
-source = ./dms/colors.conf
-source = ./dms/outputs.conf
-source = ./dms/layout.conf
-source = ./dms/cursor.conf
-source = ./dms/binds.conf
-source = ./dms/windowrules.conf
+#+begin_src lua
+require("dms.colors")
+require("dms.outputs")
+require("dms.layout")
+require("dms.cursor")
+require("dms.binds")
+require("dms.binds-user")
+require("dms.windowrules")
 #+end_src
 
 * Key Bindings
-#+begin_src conf
-# Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-bind = SUPER, Return, exec, fish -lc vterm
-# bind = SUPER, M, exit,
-bind = SUPER, r, exec, fish -lc dirvish
-bind = SUPER, p, pseudo, # dwindle
-bind = SUPER, t, togglesplit, # dwindle
+Keybindings are layered: DMS ships the defaults in =dms/binds.lua=, my overrides
+live in =dms/binds-user.lua= (git-tracked), and =hyprland.lua= holds only the
+game-workspace toggle:
 
-bind = SUPER SHIFT, P, pin
-
-bind = SUPER SHIFT, e, exec, dms ipc call powermenu toggle
-bind = SUPER, A, exec, dms ipc call spotlight toggle
-
-# Example special workspace (scratchpad)
-bind = SUPER, S, togglespecialworkspace, magic
-bind = SUPER SHIFT, S, movetoworkspace, special:magic
-
-# Move/resize windows with SUPER + LMB/RMB and dragging
-bindm = SUPER, mouse:272, movewindow
-bindm = SUPER, mouse:273, resizewindow
+#+begin_src lua
+hl.unbind("SUPER + G")
+hl.bind("SUPER + G", function()
+	local workspace = hl.get_active_workspace()
+	local target = workspace and workspace.name == "" and "previous" or "name:"
+	hl.dispatch(hl.dsp.focus({ workspace = target }))
+end, { description = "Toggle game workspace" })
 #+end_src
-
-Who will focus a window with raise it?
-#+begin_src conf
-bind = SUPER, j, cyclenext, d
-bind = SUPER, j, bringactivetotop, d
-bind = SUPER, k, cyclenext, prev, d
-bind = SUPER, k, bringactivetotop, d
-#+end_src
-[[https://github.com/hyprwm/Hyprland/discussions/5451][Raise a window upon focused? · hyprwm...]]
