@@ -11,8 +11,8 @@ packages = ["nvidia-open-dkms", "nvidia-utils", "libva-nvidia-driver"]
 =GBM_BACKEND= and =NVD_BACKEND= are obsolete and omitted.
 
 #+begin_src lua
-hl.env("LIBVA_DRIVER_NAME", "nvidia")          -- VA-API decode (libva-nvidia-driver)
-hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")  -- GLX vendor in XWayland
+hl.env("LIBVA_DRIVER_NAME", "nvidia") -- VA-API decode (libva-nvidia-driver)
+hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia") -- GLX vendor in XWayland
 #+end_src
 
 ** Display manager
@@ -63,10 +63,10 @@ hook starts =hyprland-session.target=, which brings up =dms.service=.
 #+begin_src lua
 -- DMS_STARTUP_BEGIN
 hl.on("hyprland.start", function()
-	-- Match XWayland DPI and cursor resources to the active monitor scale.
-	hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/sync-xresources-dpi.sh")
-	hl.exec_cmd("dbus-update-activation-environment --systemd --all")
-	hl.exec_cmd("systemctl --user start hyprland-session.target")
+    -- Match XWayland DPI and cursor resources to the active monitor scale.
+    hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/sync-xresources-dpi.sh")
+    hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+    hl.exec_cmd("systemctl --user start hyprland-session.target")
 end)
 -- DMS_STARTUP_END
 #+end_src
@@ -89,10 +89,7 @@ xdg-desktop-autostart.target= directly — it is refused).
 [[https://wiki.hypr.land/Configuring/Advanced-and-Cool/Environment-variables/][Environment variables – Hyprland Wiki]]
 
 #+begin_src lua
-hl.env(
-    "SSH_AUTH_SOCK",
-    os.getenv("XDG_RUNTIME_DIR") .. "/gnupg/S.gpg-agent.ssh"
-)
+hl.env("SSH_AUTH_SOCK", os.getenv("XDG_RUNTIME_DIR") .. "/gnupg/S.gpg-agent.ssh")
 
 hl.env("XMODIFIERS", "@im=fcitx")
 hl.env("QT_IM_MODULE", "fcitx")
@@ -188,50 +185,50 @@ packages = ["xdg-desktop-portal-hyprland", "xdg-desktop-portal-gtk"]
 * Core Config
 #+begin_src lua
 hl.config({
-	input = {
-		-- empty inherits XKB_DEFAULT_LAYOUT (libxkbcommon), falls back to "us"
-		kb_layout = "",
-		numlock_by_default = true,
-		follow_mouse = 0,
-		touchpad = {
-			tap_to_click = true,
-			natural_scroll = true,
-		},
-	},
-	-- gaps / border_size / rounding are managed by dms/layout.lua
-	general = {
-		layout = "dwindle",
-	},
-	decoration = {
-		active_opacity = 1.0,
-		inactive_opacity = 1.0,
-		shadow = {
-			enabled = true,
-			range = 30,
-			render_power = 5,
-			offset = "0 5",
-			color = "rgba(00000070)",
-		},
-	},
-	-- Render XWayland at native 1:1 to avoid blur under fractional scaling.
-	-- Tradeoff: XWayland windows are unscaled; compensate with in-app UI scaling.
-	xwayland = {
-		force_zero_scaling = true,
-	},
-	misc = {
-		disable_hyprland_logo = true,
-		disable_splash_rendering = true,
-		-- wake the monitor on any key press after lock.sh does `dpms off`
-		key_press_enables_dpms = true,
-		-- FPS cap for render_unfocused windows (games keep full fps in background)
-		render_unfocused_fps = 60,
-	},
-	dwindle = {
-		preserve_split = true,
-	},
-	master = {
-		mfact = 0.5,
-	},
+    input = {
+        -- empty inherits XKB_DEFAULT_LAYOUT (libxkbcommon), falls back to "us"
+        kb_layout = "",
+        numlock_by_default = true,
+        follow_mouse = 0,
+        touchpad = {
+            tap_to_click = true,
+            natural_scroll = true,
+        },
+    },
+    -- gaps / border_size / rounding are managed by dms/layout.lua
+    general = {
+        layout = "dwindle",
+    },
+    decoration = {
+        active_opacity = 1.0,
+        inactive_opacity = 1.0,
+        shadow = {
+            enabled = true,
+            range = 30,
+            render_power = 5,
+            offset = "0 5",
+            color = "rgba(00000070)",
+        },
+    },
+    -- Render XWayland at native 1:1 to avoid blur under fractional scaling.
+    -- Tradeoff: XWayland windows are unscaled; compensate with in-app UI scaling.
+    xwayland = {
+        force_zero_scaling = true,
+    },
+    misc = {
+        disable_hyprland_logo = true,
+        disable_splash_rendering = true,
+        -- wake the monitor on any key press after lock.sh does `dpms off`
+        key_press_enables_dpms = true,
+        -- FPS cap for render_unfocused windows (games keep full fps in background)
+        render_unfocused_fps = 60,
+    },
+    dwindle = {
+        preserve_split = true,
+    },
+    master = {
+        mfact = 0.5,
+    },
 })
 
 hl.animation({ leaf = "windowsIn", enabled = true, speed = 3, bezier = "default" })
@@ -244,19 +241,24 @@ hl.animation({ leaf = "border", enabled = true, speed = 3, bezier = "default" })
 
 * Window Rules
 #+begin_src lua
-hl.window_rule({ match = { class = "^(nm-connection-editor|pavucontrol)$" }, float = true, center = true, size = { 900, 600 } })
+hl.window_rule({
+    match = { class = "^(nm-connection-editor|pavucontrol)$" },
+    float = true,
+    center = true,
+    size = { 900, 600 },
+})
 hl.window_rule({ match = { class = "^(blueman-manager)$" }, float = true, center = true, size = { 600, 480 } })
 hl.window_rule({ match = { class = "^(xdg-desktop-portal)$" }, float = true })
 -- Steam notification toasts: float pinned at bottom-right, 20px margin
 hl.window_rule({
-	match = { class = "^(steam)$", title = "^(notificationtoasts)$" },
-	no_initial_focus = true,
-	pin = true
+    match = { class = "^(steam)$", title = "^(notificationtoasts)$" },
+    no_initial_focus = true,
+    pin = true,
 })
 -- gamescope containers also keep full fps in background
 hl.window_rule({
-	match = { class = "^(gamescope)$" },
-	render_unfocused = true,
+    match = { class = "^(gamescope)$" },
+    render_unfocused = true,
 })
 hl.layer_rule({ match = { namespace = "^(quickshell)$" }, no_anim = true })
 hl.layer_rule({ match = { namespace = "^dms:.*" }, no_anim = true })
@@ -264,9 +266,9 @@ hl.layer_rule({ match = { namespace = "^dms:.*" }, no_anim = true })
 -- Elden Ring Nightreign -> named workspace 
 -- Use a normal named workspace so SUPER+1..9 can leave it normally.
 hl.window_rule({
-	match = { class = "^(steam_app_2622380|nightreign\\.exe)$" },
-	workspace = "name: silent",
-	render_unfocused = true,
+    match = { class = "^(steam_app_2622380|nightreign\\.exe)$" },
+    workspace = "name: silent",
+    render_unfocused = true,
 })
 #+end_src
 
@@ -289,8 +291,8 @@ game-workspace toggle:
 #+begin_src lua
 hl.unbind("SUPER + G")
 hl.bind("SUPER + G", function()
-	local workspace = hl.get_active_workspace()
-	local target = workspace and workspace.name == "" and "previous" or "name:"
-	hl.dispatch(hl.dsp.focus({ workspace = target }))
+    local workspace = hl.get_active_workspace()
+    local target = workspace and workspace.name == "" and "previous" or "name:"
+    hl.dispatch(hl.dsp.focus({ workspace = target }))
 end, { description = "Toggle game workspace" })
 #+end_src
