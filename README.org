@@ -241,25 +241,16 @@ hl.animation({ leaf = "border", enabled = true, speed = 3, bezier = "default" })
 
 * Window Rules
 #+begin_src lua
-hl.window_rule({
-    match = { class = "^(nm-connection-editor|pavucontrol)$" },
-    float = true,
-    center = true,
-    size = { 900, 600 },
-})
 hl.window_rule({ match = { class = "^(blueman-manager)$" }, float = true, center = true, size = { 600, 480 } })
 hl.window_rule({ match = { class = "^(xdg-desktop-portal)$" }, float = true })
+
 -- Steam notification toasts: float pinned at bottom-right, 20px margin
 hl.window_rule({
     match = { class = "^(steam)$", title = "^(notificationtoasts)$" },
     no_initial_focus = true,
     pin = true,
 })
--- gamescope containers also keep full fps in background
-hl.window_rule({
-    match = { class = "^(gamescope)$" },
-    render_unfocused = true,
-})
+
 hl.layer_rule({ match = { namespace = "^(quickshell)$" }, no_anim = true })
 hl.layer_rule({ match = { namespace = "^dms:.*" }, no_anim = true })
 
