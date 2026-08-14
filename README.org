@@ -17,19 +17,20 @@ hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia") -- GLX vendor in XWayland
 #+end_src
 
 ** Display manager
-[[https://bbs.archlinux.org/viewtopic.php?id=289612][SDDM running on Wayland and Hyprland ...]]
-[[https://wiki.archlinux.org/title/SDDM#Enable_HiDPI][SDDM - ArchWiki]]
-#+begin_src conf :tangle /sudo::/etc/sddm.conf.d/default.conf :tangle no
-[General]
-# Which display server should be used.
-# Valid values are: x11, x11-user, wayland. Wayland support is experimental
-DisplayServer=wayland
-GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
-# GreeterEnvironment=QT_SCREEN_SCALE_FACTORS=2,QT_FONT_DPI=168
+greetd + DMS greeter. See [[https://wiki.archlinux.org/title/Greetd][Greetd - ArchWiki]].
 
-[Wayland]
-EnableHiDPI=true
-CompositorCommand=Hyprland
+#+begin_src toml
+[greetd]
+packages = ["greetd-dms-greeter-git"]
+#+end_src
+
+#+begin_src toml :tangle /sudo::/etc/greetd/config.toml :tangle no
+[terminal]
+vt = 1
+
+[default_session]
+command = "/usr/bin/dms-greeter --command hyprland"
+user = "greeter"
 #+end_src
 
 ** Key map
