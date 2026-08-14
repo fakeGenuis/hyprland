@@ -17,8 +17,8 @@ hl.env("no_proxy", "localhost,127.0.0.1,::1")
 
 -- DMS_STARTUP_BEGIN
 hl.on("hyprland.start", function()
-	-- Load DPI and cursor resources for XWayland applications.
-	hl.exec_cmd("xrdb -merge " .. os.getenv("HOME") .. "/.config/X11/Xresources")
+	-- Match XWayland DPI and cursor resources to the active monitor scale.
+	hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/sync-xresources-dpi.sh")
 	hl.exec_cmd("dbus-update-activation-environment --systemd --all")
 	hl.exec_cmd("systemctl --user start hyprland-session.target")
 end)
