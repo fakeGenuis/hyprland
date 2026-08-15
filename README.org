@@ -76,6 +76,11 @@ https://github.com/hyprwm/Hyprland/discussions/7923
 DMS owns autostart (=~/.config/autostart/*.desktop=), not =exec-once=. This
 hook starts =hyprland-session.target=, which brings up =dms.service=.
 
+#+begin_src toml
+[xft]
+packages = ["xorg-xrdb"]
+#+end_src
+
 #+begin_src lua
 -- DMS_STARTUP_BEGIN
 hl.on("hyprland.start", function()
