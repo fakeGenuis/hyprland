@@ -333,8 +333,30 @@ end, { description = "Toggle ScrollOverview" })
 
 * Key Bindings
 Keybindings are layered: DMS ships the defaults in =dms/binds.lua=, my overrides
-live in =dms/binds-user.lua= (git-tracked), and =hyprland.lua= holds only the
-game-workspace toggle:
+live in =dms/binds-user.lua= (git-tracked), and =hyprland.lua= applies the custom
+workspace bindings below after DMS has loaded.
+
+** Numbered workspaces
+Cycle through occupied numbered workspaces plus one trailing empty workspace.
+Named and special workspaces do not participate in the cycle.  The helper lives
+in =lib/workspaces.lua=.  Load it after the DMS keybindings, then replace the
+default =e+1= and =e-1= bindings:
+
+#+begin_src lua
+local workspaces = require("lib.workspaces")
+
+hl.unbind("SUPER + N")
+hl.bind("SUPER + N", function()
+    workspaces.focus_numbered(1)
+end, { description = "Next numbered workspace" })
+
+hl.unbind("SUPER + P")
+hl.bind("SUPER + P", function()
+    workspaces.focus_numbered(-1)
+end, { description = "Previous numbered workspace" })
+#+end_src
+
+** Game workspace
 
 #+begin_src lua
 hl.unbind("SUPER + G")
