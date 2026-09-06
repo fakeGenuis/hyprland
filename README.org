@@ -237,6 +237,9 @@ hl.config({
     xwayland = {
         force_zero_scaling = true,
     },
+    render = {
+        direct_scanout = 1,
+    },
     misc = {
         disable_hyprland_logo = true,
         disable_splash_rendering = true,
@@ -276,10 +279,9 @@ hl.window_rule({
 hl.layer_rule({ match = { namespace = "^(quickshell)$" }, no_anim = true })
 hl.layer_rule({ match = { namespace = "^dms:.*" }, no_anim = true })
 
--- Elden Ring Nightreign -> named workspace 
--- Use a normal named workspace so SUPER+1..9 can leave it normally.
+-- Steam/Proton games and Gamescope -> named workspace 
 hl.window_rule({
-    match = { class = "^(steam_app_2622380|nightreign\\.exe)$" },
+    match = { class = "^(steam_app_[0-9]+|gamescope)$" },
     workspace = "name: silent",
     render_unfocused = true,
 })
