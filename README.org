@@ -254,6 +254,12 @@ hl.config({
     master = {
         mfact = 0.5,
     },
+    scrolling = {
+        column_width = 0.5,
+        explicit_column_widths = "0.333, 0.5, 0.667, 1.0",
+        follow_focus = true,
+        wrap_focus = true,
+    },
 })
 
 hl.animation({ leaf = "windowsIn", enabled = true, speed = 3, bezier = "default" })
@@ -338,6 +344,22 @@ end, { description = "Toggle ScrollOverview" })
 Keybindings are layered: DMS ships the defaults in =dms/binds.lua=, my overrides
 live in =dms/binds-user.lua= (git-tracked), and =hyprland.lua= applies the custom
 workspace bindings below after DMS has loaded.
+
+** Workspace layouts and windows
+Cycle the active workspace through the built-in layouts with =SUPER + S=.  Cycle
+through all tiled and floating windows in the active workspace with =SUPER + TAB=.
+The helpers live in =lib/layouts.lua= and =lib/windows.lua= and support numbered,
+named, and special workspaces.
+
+#+begin_src lua
+local layouts = require("lib.layouts")
+local windows = require("lib.windows")
+
+hl.unbind("SUPER + S")
+hl.bind("SUPER + S", layouts.cycle, { description = "Cycle workspace layout" })
+hl.unbind("SUPER + TAB")
+hl.bind("SUPER + TAB", windows.cycle_next, { description = "Cycle workspace windows" })
+#+end_src
 
 ** Numbered workspaces
 Cycle through occupied numbered workspaces plus one trailing empty workspace.
