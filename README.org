@@ -56,10 +56,11 @@ packages = ["keyd"]
 Start =keyd.service= (system wide)
 #+begin_src conf :tangle /sudo::/etc/keyd/default.conf :tangle no
 [ids]
-*
+,*
 
 [main]
 leftcontrol  = overload(control, esc)
+rightshift = rightshift
 #+end_src
 
 ** Monitor
