@@ -89,7 +89,8 @@ hl.on("hyprland.start", function()
     hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/sync-xresources-dpi.sh")
     hl.exec_cmd("dbus-update-activation-environment --systemd --all")
     hl.exec_cmd("systemctl --user start hyprland-session.target")
-    hl.exec_cmd("hyprpm reload -n")
+    -- Load plugins, then re-parse the config so plugin.* keys apply.
+    hl.exec_cmd("hyprpm reload -n && hyprctl reload")
 end)
 -- DMS_STARTUP_END
 #+end_src
@@ -308,6 +309,44 @@ require("dms.windowrules")
 TODO: Add a DankBar widget to display and switch the active Hyprland window layout.
 
 * Plugins
+#+begin_src toml
+[plugins]
+packages = ["hyprpm"]
+#+end_src
+
+** ABI Notify Hook
+#+begin_src conf :tangle /sudo::/etc/pacman.d/hooks/95-hyprpm-abi-notify.hook :tangle no
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = hyprland
+Target = aquamarine
+
+[Action]
+Description = Reminding you to rebuild hyprpm plugins (hyprpm update)...
+When = PostTransaction
+Exec = /usr/local/bin/hyprpm-abi-notify
+#+end_src
+
+#+begin_src bash :tangle /sudo::/usr/local/bin/hyprpm-abi-notify :file-mode (identity #o755) :shebang "#!/usr/bin/bash" :tangle no
+# Helper for 95-hyprpm-abi-notify.hook: tell the graphical session that hyprpm
+# plugins need a rebuild. Silent when nobody is logged in.
+set -u
+
+title="hyprpm plugins need a rebuild"
+body="hyprland/aquamarine upgraded - run: hyprpm update && hyprpm reload -n"
+
+notified=0
+for row in $(loginctl list-sessions --no-legend 2>/dev/null | awk '{print $2":"$3}' | sort -u); do
+    bus="/run/user/${row%%:*}/bus"
+    [[ -S $bus ]] || continue
+    runuser -u "${row#*:}" -- env DBUS_SESSION_BUS_ADDRESS="unix:path=$bus" \
+        notify-send -u critical -a pacman "$title" "$body" && notified=1
+done
+
+(( notified )) || echo "hyprpm-abi-notify: no graphical session, notification skipped"
+#+end_src
+
 ** hyprfocus
 [[https://github.com/hyprwm/hyprland-plugins][hyprfocus]] briefly animates the newly focused window, making keyboard-driven
 focus changes easier to follow.
