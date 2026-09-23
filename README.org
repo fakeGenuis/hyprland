@@ -121,88 +121,12 @@ hl.env("https_proxy", "http://127.0.0.1:8889")
 hl.env("no_proxy", "localhost,127.0.0.1,::1")
 #+end_src
 
-** COMMENT Eye Candy
-#+begin_src toml
-["eye-candy"]
-packages = ["gammastep"]
-#+end_src
-
-#+begin_src conf
-exec-once = gammastep-indicator
-#+end_src
-
-Configuration see [[file:~/.config/gammastep/config.ini]]
-
 * After
-** COMMENT Wallpaper
-#+begin_src toml
-[wallpaper]
-packages = ["swww", "waypaper"]
-#+end_src
-
-[[https://anufrievroman.gitbook.io/waypaper/usage][Usage | Waypaper]]
-#+begin_src conf
-exec-once = waypaper --restore
-exec-once = systemctl --user start waypaper.timer
-#+end_src
-
-#+begin_src conf :tangle ~/.config/systemd/user/waypaper.timer
-[Unit]
-Description=Set a random wallpaper every minute
-
-[Timer]
-OnStartupSec=1min
-OnUnitActiveSec=5min
-
-[Install]
-WantedBy=timers.target
-#+end_src
-
-#+begin_src conf :tangle ~/.config/systemd/user/waypaper.service
-[Unit]
-Description=Set a random wallpaper with waypaper
-
-[Service]
-Type=oneshot
-# https://unix.stackexchange.com/a/547817
-LogLevelMax=alert
-SyslogLevel=2
-ExecStart=waypaper --random
-#+end_src
-
-** COMMENT Lock Screen
-[[https://www.reddit.com/r/hyprland/comments/14u9p3v/turning_off_screens_after_locking_them/][Turning off screens after locking them ]]
-
-#+begin_src conf
-exec-once = systemctl --user start hypridle.service
-bind = $mainMod SHIFT, l, exec, loginctl lock-session
-#+end_src
-
-#+begin_src bash :tangle lock.sh :file-mode (identity #o755) :shebang "#!/usr/bin/bash"
-pidof hyprlock || hyprlock &
-sleep 7
-hyprctl dispatch dpms off
-#+end_src
-
-#+begin_src conf :tangle hypridle.conf
-general {
-    lock_cmd = ~/.config/hypr/lock.sh
-    on_lock_cmd = openrgb --noautoconnect -m off
-    on_unlock_cmd = openrgb --noautoconnect -m rainbow
-}
-
-listener {
-    timeout = 600
-    on-timeout = loginctl lock-session
-}
-#+end_src
-
-** Others
-Screen sharing
+** Screen sharing
 [[https://wiki.archlinux.org/title/Open_Broadcaster_Software#Wayland][Open Broadcaster Software - ArchWiki]]
 [[https://wiki.archlinux.org/title/XDG_Desktop_Portal#Portal_does_not_start][XDG Desktop Portal - ArchWiki]]
 #+begin_src toml
-[others]
+[screen-sharing]
 packages = ["xdg-desktop-portal-hyprland", "xdg-desktop-portal-gtk"]
 #+end_src
 
