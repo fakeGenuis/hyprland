@@ -6,7 +6,7 @@
 ** Nvidia
 #+begin_src toml
 [nvidia]
-packages = ["nvidia-open-dkms", "libva-nvidia-driver"]
+packages = ["nvidia-open-dkms:100", "nvidia-580xx-dkms:010", "libva-nvidia-driver"]
 #+end_src
 
 =GBM_BACKEND= and =NVD_BACKEND= are obsolete and omitted.
