@@ -122,6 +122,16 @@ hl.env("https_proxy", "http://127.0.0.1:8889")
 hl.env("no_proxy", "localhost,127.0.0.1,::1")
 #+end_src
 
+** Logout
+DMS's logout force-kills =user@1000.service=, so =/run/user/1000= is never
+rebuilt and the next login's autostart generator fails with =File exists=.
+Use as =customPowerActionLogout= -- DMS already wraps it in =systemd-run --user
+--scope=, so do not add one (a nested scope collides on the unit name):
+
+#+begin_src sh :tangle no
+systemctl --user stop graphical-session.target; hyprctl dispatch exit || loginctl terminate-session $XDG_SESSION_ID
+#+end_src
+
 * After
 ** Screen sharing
 [[https://wiki.archlinux.org/title/Open_Broadcaster_Software#Wayland][Open Broadcaster Software - ArchWiki]]
