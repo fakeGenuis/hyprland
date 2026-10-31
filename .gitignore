@@ -6,6 +6,7 @@ packages.toml
 dms/binds.lua
 dms/colors.lua
 dms/cursor.lua
+dms/input.lua
 dms/layout.lua
 dms/outputs.lua
 dms/windowrules.lua
