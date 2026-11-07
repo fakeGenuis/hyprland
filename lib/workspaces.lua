@@ -10,7 +10,7 @@ function M.focus_numbered(step)
     local ids = {}
 
     for _, workspace in ipairs(hl.get_workspaces()) do
-        if workspace.id > 0 and not workspace.is_empty then
+        if workspace.id and workspace.id > 0 and not workspace.is_empty then
             ids[#ids + 1] = workspace.id
         end
     end
