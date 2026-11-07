@@ -241,10 +241,8 @@ require("dms.binds")
 require("dms.binds-user")
 require("dms.windowrules")
 
--- Optional machine-local window rules.
-if package.searchpath("private.windowrules", package.path) then
-    require("private.windowrules")
-end
+-- Machine-local config and project-provided rules, loaded in filename order.
+require("./private/*.lua")
 #+end_src
 
 TODO: Add a DankBar widget to display and switch the active Hyprland window layout.
